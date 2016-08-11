@@ -1,55 +1,32 @@
 'use strict'
 
 
-$(function() {
-
+$(function onPageLoad() {
   $('#filterer-query').on('input', inputChange)
-
-  //$('#filterer-results').data('og', getItems('#filterer-results').toString())
-
-
-  $('#filterer-button').click(function() {
-    console.log('yo')
-    console.log( $('#filterer-results').data('og').split(','))
-  })
-
   fuzzySearch.register('#filterer-results')
-
-
-  /* Automatically click button after 2 seconds FOR DEV USE */
-  //window.setTimeout(function() { $('#filterer-button').click() }, 1000)
 })
 
 
 function inputChange() {
   let currentItems = getCurrentItems('#filterer-results')
-  //sort(items)
   let query = $('#filterer-query').val()
-  //console.log('Query: ', query)
-  fuzzySearch(query)//, items)
+  fuzzySearch(query)
 }
 
 
-function sort(items) {
-  console.log('Sorting items')
-  let sorted = items.sort()
-  updateResults(sorted)
-}
-
-
-function updateResults(items) {
+function updateResults(items, queryLength) {
   console.log('Updating results')
   let list = document.getElementById('filterer-results')
   if (items.length === 0) {
     list.innerHTML = '<li class="no-results">No results found.</li>'
-  } else list.innerHTML = listify(items).join('')
+  } else list.innerHTML = listify(items, queryLength).join('')
 }
 
 
 function fuzzySearch(query, items) {
   if (fuzzySearch[query]) {
     console.log('Match found from memo:', query)
-    updateResults(fuzzySearch[query])
+    updateResults(fuzzySearch[query], query.length || 0)
     return fuzzySearch[query] 
   } 
 
@@ -60,12 +37,15 @@ function fuzzySearch(query, items) {
 
   console.log('Fuzzy searching through [', items.length,']items')
 
-  let results = items.filter(function(word) { 
-    word = word.toLowerCase()
+  let results = items.filter(function(item) { 
+    let word = item.word.toLowerCase()
     let widx = 0
     let qidx = 0
     for ( ; widx < word.length; widx++) {
       if (query[qidx] === word[widx]) {
+        /* Add match index to matches for highlighting */
+        console.log('pushing', widx, 'to matches')
+        item.matches[qidx] = widx
         /* If this is the last letter in the query, return true */
         if (qidx === query.length - 1)
           return true
@@ -76,7 +56,7 @@ function fuzzySearch(query, items) {
     return false
   })
   fuzzySearch[query] = results
-  updateResults(results)
+  updateResults(results, query.length)
 }
 
 fuzzySearch.register = function(items) {
@@ -86,14 +66,40 @@ fuzzySearch.register = function(items) {
 
 
 /* Surround each item in items with <li> open & close tags */
-function listify(items) {
-  return items.map(function(e) { return '<li>' + e + '</li>'})
+function listify(items, queryLength) {
+  return items.map(function(item) { 
+    let chars = item.word.split('')
+    let matches = item.matches.slice(0, queryLength)
+
+    if (matches.length === 0)
+      return '<li>' + chars.join('') + '</li>'
+    else {
+      for (let midx = 0; midx < matches.length; midx++) {
+        let c = chars[matches[midx]] 
+        if (midx === matches.length - 1)
+          chars[matches[midx]] = 
+            '<span class="filterer-match">' + c + '</span></span>' 
+        else
+          chars[matches[midx]] = '<span class="filterer-match">' + c + '</span>' 
+      } 
+      return '<li><span class="filterer-run">' + chars.join('') + '</li>'
+    }
+//    let word = item.word.split('').map(function(v, idx) {
+//      return item.matches[idx] ? : v
+//    }).join('')
+
+  })
 }
 
 
 function getCurrentItems(ul) {
   return $(ul + ' li')
-    .map(function() { return $(this).text() })
+    .map(function() { 
+      return {
+        word: $(this).text(),
+        matches: []
+      }
+    })
     .toArray()
 }
 
