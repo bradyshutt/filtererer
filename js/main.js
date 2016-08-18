@@ -2,8 +2,16 @@
 
 
 $(function onPageLoad() {
-  $('#filterer-query').on('input', inputChange)
-  fuzzySearch.register('#filterer-results')
+  $('#filterer-query').on('input', inputChange).focus()
+
+  let p = jQuery.getJSON('https://www.ifixit.com/api/2.0/wikis/CATEGORY?display=titles&limit=10000&offset=1&pretty')
+  p.then((data) => {
+    fillFromList('#filterer-results', data)
+    fuzzySearch.register('#filterer-results')
+  })
+
+  
+
 })
 
 
@@ -44,7 +52,6 @@ function fuzzySearch(query, items) {
     for ( ; widx < word.length; widx++) {
       if (query[qidx] === word[widx]) {
         /* Add match index to matches for highlighting */
-        console.log('pushing', widx, 'to matches')
         item.matches[qidx] = widx
         /* If this is the last letter in the query, return true */
         if (qidx === query.length - 1)
@@ -102,6 +109,16 @@ function getCurrentItems(ul) {
     })
     .toArray()
 }
+
+function fillFromList(ul, list) {
+  let l = list.map((cv, idx) => ({
+      word: cv,
+      matches: []
+    }))
+  updateResults(l, 0)
+}
+
+
 
 
 
