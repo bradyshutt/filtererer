@@ -2,6 +2,9 @@
 
 
 $(function onPageLoad() {
+   document.body.style.zoom="175%"
+   $(document.body).css('-moz-transform', 'scale(1.75)')
+   //-moz-transform: scale(1.75);
   $('#filterer-query').on('input', inputChange).focus()
 
 //  let p = jQuery.getJSON('https://www.ifixit.com/api/2.0/wikis/CATEGORY?display=titles&limit=10000&offset=1&pretty')
