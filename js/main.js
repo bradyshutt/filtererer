@@ -41,6 +41,7 @@ function updateResults(items, queryLength) {
 function fuzzySearch(query, items) {
   if (fuzzySearch[query]) {
     console.log('Match found from memo:', query)
+   $('.subNote').text('Match found from memo, no filtering necessary.')
     updateResults(fuzzySearch[query], query.length || 0)
     return fuzzySearch[query] 
   } 
@@ -50,6 +51,8 @@ function fuzzySearch(query, items) {
   else 
     items = items || fuzzySearch['__default__']
 
+   $('.subNote').show()
+   let initLength = items.length
   console.log('Fuzzy searching through [', items.length,']items')
 
   let results = items.filter(function(item) { 
@@ -71,6 +74,7 @@ function fuzzySearch(query, items) {
   })
   fuzzySearch[query] = results
   updateResults(results, query.length)
+  $('.subNote').text('Filtered through '+items.length+' items; '+results.length+' results left.')
 }
 
 fuzzySearch.register = function(items) {

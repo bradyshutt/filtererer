@@ -1,0 +1,4 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+fuzzySearch	/home/bshutt/dev/workspace/mini-projects/filterer/js/main.js	/^function fuzzySearch(query, items) {$/;"	f	language:JavaScript	function:updateResults
+getCurrentItems	/home/bshutt/dev/workspace/mini-projects/filterer/js/main.js	/^function getCurrentItems(ul) {$/;"	f	language:JavaScript	function:fuzzySearch.register
+listify	/home/bshutt/dev/workspace/mini-projects/filterer/js/main.js	/^function listify(items, queryLength) {$/;"	f	language:JavaScript	function:fuzzySearch.register
